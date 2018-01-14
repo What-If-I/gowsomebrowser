@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "Engine";
+option java_outer_classname = "Engine";
+
+package browser;
+
+import "layout.proto";
+
+service EngineService {
+    rpc connect (Message) returns (AppInfo);
+    rpc sendLayout (Layout) returns (Message);
+}
+
+service ViewService {
+    rpc runApp (Link) returns (AppInfo);
+    rpc getLayout (AppInfo) returns (stream layout.Grid)
+}
+
+
+message Message {
+    string content = 1;
+}
+
+message Link {
+    string link = 1;
+}
+
+message AppInfo {
+    int32 id = 1;
+}
+
+message Layout {
+    AppInfo appInfo = 1;
+    layout.Grid grid = 2;
+}

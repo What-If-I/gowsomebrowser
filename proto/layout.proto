@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "Layout";
+option java_outer_classname = "Layout";
+
+package browser.layout;
+
+
+message Units {
+    int32 value = 1;
+    enum Type {
+        PIXEL = 0;
+        PERCENT = 1;
+    }
+    Type type = 2;
+}
+
+message Color {
+    string value = 1;
+    enum Type {
+        HEX = 0;
+        RGBA = 1;
+    }
+    Type type = 2;
+}
+
+
+// Have no idea how to make it, yet
+message Function {
+
+}
+
+message Area {
+    Units width = 1;
+    Units height = 2;
+
+    Units marginLeft = 3;
+    Units marginTop = 4;
+    Units marginRight = 5;
+    Units marginBottom = 6;
+
+    Units paddingLeft = 7;
+    Units paddingTop = 8;
+    Units paddingRight = 9;
+    Units paddingBottom = 10;
+}
+
+message Events {
+    Function onclick = 1;
+    Function onhover = 2;
+}
+
+
+// Square area
+message Square {
+    Area size = 1;
+
+    Color bgcolor = 2;
+    Events bindevents = 3;
+}
+
+message Text {
+    string content = 1;
+    string size = 2;
+    Color color = 3;
+
+}
+
+message TextBox {
+    Area size = 1;
+    Text text = 2;
+    Color color = 3;
+
+}
+
+message Button {
+
+}
+
+message Image {
+
+}
+
+
+message Element {
+    oneof element {
+        Square box = 1;
+        TextBox textbox = 2;
+        Button button = 3;
+        Image image = 4;
+        Grid grid =5;
+    }
+}
+
+
+message ElementsLayout {
+    int32 elemPosition = 1;
+    int32 rowStart = 2;
+    int32 rowEnd = 3;
+    int32 colStart = 4;
+    int32 colEnd = 5;
+}
+
+message Grid {
+    Area size = 1;
+    Color color = 2;
+
+    repeated int32 rows = 3;
+    repeated int32 columns = 4;
+
+    repeated Element elements = 5;
+    repeated ElementsLayout elementslayout =6;
+}
