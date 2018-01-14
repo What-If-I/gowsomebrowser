@@ -6,16 +6,16 @@ option java_outer_classname = "Engine";
 
 package browser;
 
-import "layout.proto";
+import "layout/layout.proto";
 
-service EngineService {
-    rpc connect (Message) returns (AppInfo);
-    rpc sendLayout (Layout) returns (Message);
+
+service AppService {
+    rpc Register (Message) returns (AppInfo);
+    rpc SendLayout (LayoutMessage) returns (Message);
 }
 
 service ViewService {
-    rpc runApp (Link) returns (AppInfo);
-    rpc getLayout (AppInfo) returns (stream layout.Grid)
+    rpc RunApp (Link) returns (stream layout.Grid);
 }
 
 
@@ -28,10 +28,10 @@ message Link {
 }
 
 message AppInfo {
-    int32 id = 1;
+    string id = 1;
 }
 
-message Layout {
+message LayoutMessage {
     AppInfo appInfo = 1;
     layout.Grid grid = 2;
 }

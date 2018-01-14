@@ -4,7 +4,7 @@ option java_multiple_files = true;
 option java_package = "Layout";
 option java_outer_classname = "Layout";
 
-package browser.layout;
+package layout;
 
 
 message Units {
@@ -94,7 +94,7 @@ message Element {
 }
 
 
-message ElementsLayout {
+message ElementLayout {
     int32 elemPosition = 1;
     int32 rowStart = 2;
     int32 rowEnd = 3;
@@ -106,9 +106,9 @@ message Grid {
     Area size = 1;
     Color color = 2;
 
-    repeated int32 rows = 3;
-    repeated int32 columns = 4;
+    int32 rows = 3;
+    int32 columns = 4;
 
     repeated Element elements = 5;
-    repeated ElementsLayout elementslayout =6;
+    repeated ElementLayout elementslayout = 6;
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	pb "github.com/What-If-I/gowsomebrowser/proto"
-	layout "github.com/What-If-I/gowsomebrowser/proto/layout"
+	"github.com/What-If-I/gowsomebrowser/proto/layout"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"log"
@@ -16,25 +16,34 @@ func main() {
 		log.Fatalln("GRPC connection error:", err)
 	}
 	defer conn.Close()
-	log.Println(pb.Message{"Hey"})
 
+	// Constructing layout
 	black := layout.Color{Value: "FFFFFF"}
 	text := layout.Text{Content: "Test Content", Size: "10", Color: &black}
 	log.Println(text)
 
-	px10 := layout.Units{Value: 10}
-	area := layout.Area{
-		Width: &px10, Height: &px10, MarginLeft: &layout.Units{}, MarginTop: &layout.Units{}, MarginRight: &layout.Units{},
-		MarginBottom: &layout.Units{}, PaddingLeft: &layout.Units{}, PaddingTop: &layout.Units{},
-		PaddingRight: &layout.Units{}, PaddingBottom: &layout.Units{}}
+	px40 := layout.Units{Value: 40, Type: layout.Units_PIXEL}
+	percent100 := layout.Units{Value: 100, Type:layout.Units_PERCENT}
+	area := layout.Area{Width: &px40, Height: &px40}
+
 	textArea := layout.TextBox{Size: &area, Text: &text, Color: &black}
 	elements := []*layout.Element{{&layout.Element_Textbox{Textbox: &textArea}}}
+	elementsLayout := []*layout.ElementLayout{
+		{ElemPosition: 1, RowStart: 2, RowEnd: 2, ColStart: 2, ColEnd: 2},
+	}
 	grid := layout.Grid{
-		Size: &area, Color: &black,
-		Rows: []*layout.Grid{}, Columns: []*layout.Grid{}, Elements: elements}
+		Size: &layout.Area{Width:&percent100, Height:&percent100}, Color: &black,
+		Rows: 3, Columns: 3, Elements: elements, Elementslayout: elementsLayout}
 
-	client := pb.NewEngineServiceClient(conn)
-	resp, err := client.SendLayout(context.Background(), &grid)
+	client := pb.NewAppServiceClient(conn)
+
+	appName := pb.Message{Content: "TestApp"}
+	appID, _ := client.Register(context.Background(), &appName)
+	log.Println("got AppId", appID)
+
+	layoutMessage := pb.LayoutMessage{AppInfo: appID, Grid: &grid}
+
+	resp, err := client.SendLayout(context.Background(), &layoutMessage)
 	if err != nil {
 		log.Fatalln(err)
 	}

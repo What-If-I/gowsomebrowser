@@ -1,5 +1,5 @@
 //go:generate protoc -I ./proto/ --go_out=plugins=grpc:./proto/ ./proto/engine.proto
-//go:generate protoc -I ./proto/ --go_out=plugins=grpc:./proto/layout/ ./proto/layout.proto
+//go:generate protoc -I ./proto/ --go_out=plugins=grpc:./proto/ ./proto/layout/layout.proto
 
 package main
 
@@ -25,8 +25,7 @@ func main() {
 	cmd := exec.Command("go", "run", "main.go")
 	var out bytes.Buffer
 	cmd.Stdout = &out
-	err := cmd.Start()
-	cmd.Wait()
+	err := cmd.Run()
 	if err != nil {
 		log.Fatal(err)
 	}

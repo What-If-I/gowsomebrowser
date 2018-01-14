@@ -9,13 +9,16 @@ It is generated from these files:
 
 It has these top-level messages:
 	Message
+	Link
+	AppInfo
+	LayoutMessage
 */
 package browser
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import browser_layout "github.com/What-If-I/gowsomebrowser/proto/layout"
+import layout "github.com/What-If-I/gowsomebrowser/proto/layout"
 
 import (
 	context "golang.org/x/net/context"
@@ -49,8 +52,67 @@ func (m *Message) GetContent() string {
 	return ""
 }
 
+type Link struct {
+	Link string `protobuf:"bytes,1,opt,name=link" json:"link,omitempty"`
+}
+
+func (m *Link) Reset()                    { *m = Link{} }
+func (m *Link) String() string            { return proto.CompactTextString(m) }
+func (*Link) ProtoMessage()               {}
+func (*Link) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *Link) GetLink() string {
+	if m != nil {
+		return m.Link
+	}
+	return ""
+}
+
+type AppInfo struct {
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *AppInfo) Reset()                    { *m = AppInfo{} }
+func (m *AppInfo) String() string            { return proto.CompactTextString(m) }
+func (*AppInfo) ProtoMessage()               {}
+func (*AppInfo) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *AppInfo) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type LayoutMessage struct {
+	AppInfo *AppInfo     `protobuf:"bytes,1,opt,name=appInfo" json:"appInfo,omitempty"`
+	Grid    *layout.Grid `protobuf:"bytes,2,opt,name=grid" json:"grid,omitempty"`
+}
+
+func (m *LayoutMessage) Reset()                    { *m = LayoutMessage{} }
+func (m *LayoutMessage) String() string            { return proto.CompactTextString(m) }
+func (*LayoutMessage) ProtoMessage()               {}
+func (*LayoutMessage) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *LayoutMessage) GetAppInfo() *AppInfo {
+	if m != nil {
+		return m.AppInfo
+	}
+	return nil
+}
+
+func (m *LayoutMessage) GetGrid() *layout.Grid {
+	if m != nil {
+		return m.Grid
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Message)(nil), "browser.Message")
+	proto.RegisterType((*Link)(nil), "browser.Link")
+	proto.RegisterType((*AppInfo)(nil), "browser.AppInfo")
+	proto.RegisterType((*LayoutMessage)(nil), "browser.LayoutMessage")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -61,115 +123,213 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for EngineService service
+// Client API for AppService service
 
-type EngineServiceClient interface {
-	Connect(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
-	SendLayout(ctx context.Context, in *browser_layout.Grid, opts ...grpc.CallOption) (*Message, error)
+type AppServiceClient interface {
+	Register(ctx context.Context, in *Message, opts ...grpc.CallOption) (*AppInfo, error)
+	SendLayout(ctx context.Context, in *LayoutMessage, opts ...grpc.CallOption) (*Message, error)
 }
 
-type engineServiceClient struct {
+type appServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewEngineServiceClient(cc *grpc.ClientConn) EngineServiceClient {
-	return &engineServiceClient{cc}
+func NewAppServiceClient(cc *grpc.ClientConn) AppServiceClient {
+	return &appServiceClient{cc}
 }
 
-func (c *engineServiceClient) Connect(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
-	out := new(Message)
-	err := grpc.Invoke(ctx, "/browser.EngineService/connect", in, out, c.cc, opts...)
+func (c *appServiceClient) Register(ctx context.Context, in *Message, opts ...grpc.CallOption) (*AppInfo, error) {
+	out := new(AppInfo)
+	err := grpc.Invoke(ctx, "/browser.AppService/Register", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *engineServiceClient) SendLayout(ctx context.Context, in *browser_layout.Grid, opts ...grpc.CallOption) (*Message, error) {
+func (c *appServiceClient) SendLayout(ctx context.Context, in *LayoutMessage, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := grpc.Invoke(ctx, "/browser.EngineService/sendLayout", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/browser.AppService/SendLayout", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for EngineService service
+// Server API for AppService service
 
-type EngineServiceServer interface {
-	Connect(context.Context, *Message) (*Message, error)
-	SendLayout(context.Context, *browser_layout.Grid) (*Message, error)
+type AppServiceServer interface {
+	Register(context.Context, *Message) (*AppInfo, error)
+	SendLayout(context.Context, *LayoutMessage) (*Message, error)
 }
 
-func RegisterEngineServiceServer(s *grpc.Server, srv EngineServiceServer) {
-	s.RegisterService(&_EngineService_serviceDesc, srv)
+func RegisterAppServiceServer(s *grpc.Server, srv AppServiceServer) {
+	s.RegisterService(&_AppService_serviceDesc, srv)
 }
 
-func _EngineService_Connect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Message)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EngineServiceServer).Connect(ctx, in)
+		return srv.(AppServiceServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/browser.EngineService/Connect",
+		FullMethod: "/browser.AppService/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EngineServiceServer).Connect(ctx, req.(*Message))
+		return srv.(AppServiceServer).Register(ctx, req.(*Message))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EngineService_SendLayout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(browser_layout.Grid)
+func _AppService_SendLayout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LayoutMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EngineServiceServer).SendLayout(ctx, in)
+		return srv.(AppServiceServer).SendLayout(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/browser.EngineService/SendLayout",
+		FullMethod: "/browser.AppService/SendLayout",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EngineServiceServer).SendLayout(ctx, req.(*browser_layout.Grid))
+		return srv.(AppServiceServer).SendLayout(ctx, req.(*LayoutMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _EngineService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "browser.EngineService",
-	HandlerType: (*EngineServiceServer)(nil),
+var _AppService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "browser.AppService",
+	HandlerType: (*AppServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "connect",
-			Handler:    _EngineService_Connect_Handler,
+			MethodName: "Register",
+			Handler:    _AppService_Register_Handler,
 		},
 		{
-			MethodName: "sendLayout",
-			Handler:    _EngineService_SendLayout_Handler,
+			MethodName: "SendLayout",
+			Handler:    _AppService_SendLayout_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "engine.proto",
 }
 
+// Client API for ViewService service
+
+type ViewServiceClient interface {
+	RunApp(ctx context.Context, in *Link, opts ...grpc.CallOption) (ViewService_RunAppClient, error)
+}
+
+type viewServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewViewServiceClient(cc *grpc.ClientConn) ViewServiceClient {
+	return &viewServiceClient{cc}
+}
+
+func (c *viewServiceClient) RunApp(ctx context.Context, in *Link, opts ...grpc.CallOption) (ViewService_RunAppClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_ViewService_serviceDesc.Streams[0], c.cc, "/browser.ViewService/RunApp", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &viewServiceRunAppClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ViewService_RunAppClient interface {
+	Recv() (*layout.Grid, error)
+	grpc.ClientStream
+}
+
+type viewServiceRunAppClient struct {
+	grpc.ClientStream
+}
+
+func (x *viewServiceRunAppClient) Recv() (*layout.Grid, error) {
+	m := new(layout.Grid)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// Server API for ViewService service
+
+type ViewServiceServer interface {
+	RunApp(*Link, ViewService_RunAppServer) error
+}
+
+func RegisterViewServiceServer(s *grpc.Server, srv ViewServiceServer) {
+	s.RegisterService(&_ViewService_serviceDesc, srv)
+}
+
+func _ViewService_RunApp_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Link)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ViewServiceServer).RunApp(m, &viewServiceRunAppServer{stream})
+}
+
+type ViewService_RunAppServer interface {
+	Send(*layout.Grid) error
+	grpc.ServerStream
+}
+
+type viewServiceRunAppServer struct {
+	grpc.ServerStream
+}
+
+func (x *viewServiceRunAppServer) Send(m *layout.Grid) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+var _ViewService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "browser.ViewService",
+	HandlerType: (*ViewServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "RunApp",
+			Handler:       _ViewService_RunApp_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "engine.proto",
+}
+
 func init() { proto.RegisterFile("engine.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 160 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0xcd, 0x4b, 0xcf,
-	0xcc, 0x4b, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4f, 0x2a, 0xca, 0x2f, 0x2f, 0x4e,
-	0x2d, 0x92, 0xe2, 0xc9, 0x49, 0xac, 0xcc, 0x2f, 0x2d, 0x81, 0x08, 0x2b, 0x29, 0x73, 0xb1, 0xfb,
-	0xa6, 0x16, 0x17, 0x27, 0xa6, 0xa7, 0x0a, 0x49, 0x70, 0xb1, 0x27, 0xe7, 0xe7, 0x95, 0xa4, 0xe6,
-	0x95, 0x48, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0xc1, 0xb8, 0x46, 0x25, 0x5c, 0xbc, 0xae, 0x60,
-	0xb3, 0x82, 0x53, 0x8b, 0xca, 0x32, 0x93, 0x53, 0x85, 0x74, 0xc1, 0x4a, 0xf3, 0x52, 0x93, 0x4b,
-	0x84, 0x04, 0xf4, 0xa0, 0x06, 0xeb, 0x41, 0xcd, 0x91, 0xc2, 0x10, 0x11, 0x32, 0xe1, 0xe2, 0x2a,
-	0x4e, 0xcd, 0x4b, 0xf1, 0x01, 0x5b, 0x2c, 0x24, 0x02, 0x97, 0x87, 0xba, 0xc4, 0xbd, 0x28, 0x33,
-	0x05, 0x53, 0x97, 0x93, 0x10, 0x17, 0x1b, 0xc4, 0x56, 0x27, 0x28, 0x1d, 0xc0, 0x98, 0xc4, 0x06,
-	0x76, 0xb5, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0xa6, 0x10, 0x10, 0x89, 0xdc, 0x00, 0x00, 0x00,
+	// 272 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x91, 0x41, 0x4b, 0xc3, 0x40,
+	0x10, 0x85, 0x49, 0x09, 0x89, 0x4e, 0x5b, 0x91, 0x11, 0x24, 0xe6, 0x54, 0xe2, 0x41, 0xf1, 0x10,
+	0x25, 0x42, 0xef, 0x29, 0x88, 0x08, 0x15, 0x24, 0x05, 0x6f, 0x1e, 0xd2, 0xee, 0x18, 0x86, 0x94,
+	0xdd, 0x65, 0xb3, 0xb5, 0xf8, 0xef, 0x85, 0xcd, 0xc6, 0x52, 0x7a, 0x9a, 0x5d, 0xde, 0xe3, 0xbd,
+	0x0f, 0x1e, 0x4c, 0x48, 0x36, 0x2c, 0x29, 0xd7, 0x46, 0x59, 0x85, 0xf1, 0xda, 0xa8, 0x7d, 0x47,
+	0x26, 0xbd, 0xda, 0xd6, 0xbf, 0x6a, 0x67, 0x1f, 0xfb, 0xd3, 0xab, 0xd9, 0x2d, 0xc4, 0xef, 0xd4,
+	0x75, 0x75, 0x43, 0x98, 0x40, 0xbc, 0x51, 0xd2, 0x92, 0xb4, 0x49, 0x30, 0x0b, 0xee, 0xcf, 0xab,
+	0xe1, 0x9b, 0xa5, 0x10, 0x2e, 0x59, 0xb6, 0x88, 0x10, 0x6e, 0x59, 0xb6, 0x5e, 0x76, 0xef, 0xec,
+	0x06, 0xe2, 0x52, 0xeb, 0x37, 0xf9, 0xad, 0xf0, 0x02, 0x46, 0x2c, 0xbc, 0x38, 0x62, 0x91, 0x7d,
+	0xc1, 0x74, 0xe9, 0xba, 0x86, 0x86, 0x07, 0x88, 0xeb, 0xde, 0xeb, 0x5c, 0xe3, 0xe2, 0x32, 0xf7,
+	0x70, 0xb9, 0xcf, 0xa8, 0x06, 0x03, 0xce, 0x20, 0x6c, 0x0c, 0x8b, 0x64, 0xe4, 0x8c, 0x93, 0xdc,
+	0x53, 0xbf, 0x1a, 0x16, 0x95, 0x53, 0x0a, 0x0b, 0x50, 0x6a, 0xbd, 0x22, 0xf3, 0xc3, 0x1b, 0xc2,
+	0x1c, 0xce, 0x2a, 0x6a, 0xb8, 0xb3, 0x64, 0xf0, 0x10, 0xeb, 0x9b, 0xd3, 0x93, 0x22, 0x9c, 0x03,
+	0xac, 0x48, 0x8a, 0x1e, 0x10, 0xaf, 0xff, 0xf5, 0x23, 0xe2, 0xf4, 0x24, 0xa9, 0x98, 0xc3, 0xf8,
+	0x93, 0x69, 0x3f, 0xd4, 0xde, 0x41, 0x54, 0xed, 0x64, 0xa9, 0x35, 0x4e, 0x0f, 0x11, 0x2c, 0xdb,
+	0xf4, 0x88, 0xf8, 0x29, 0x58, 0x20, 0x44, 0x2f, 0x6e, 0x96, 0x85, 0xbf, 0x1f, 0xc1, 0x3a, 0x72,
+	0x1b, 0x3c, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0x4c, 0x45, 0x1b, 0x2b, 0xb1, 0x01, 0x00, 0x00,
 }
