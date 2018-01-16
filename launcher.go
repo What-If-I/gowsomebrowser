@@ -18,21 +18,16 @@ import (
 const defaultPort = ":50051"
 
 func main() {
+	appName := "main.go"
 	go engine.RunGRPC(defaultPort)
+	go runView()
 
-	url := "http://127.0.0.1:8000/main.go"
-	downloadFromUrl(url)
-	cmd := exec.Command("go", "run", "main.go")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf(out.String())
+	//url := "http://127.0.0.1:8000/" + appName
+	//downloadFromUrl(url)
+	runGoApp(appName)
 }
 
-func downloadFromUrl(url string) {
+func downloadByUrl(url string) {
 	tokens := strings.Split(url, "/")
 	fileName := tokens[len(tokens)-1]
 	log.Println("Downloading", url, "to", fileName)
@@ -55,4 +50,21 @@ func downloadFromUrl(url string) {
 	}
 
 	log.Println(n, "bytes downloaded.")
+}
+
+
+func runGoApp(path string) {
+	// todo: pass port as an arg to the app
+	cmd := exec.Command("go", "run " + path)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		log.Fatalf("Failed to run %s: %s", path, err)
+	}
+	fmt.Printf(out.String())
+}
+
+func runView() {
+	runGoApp("testView.go")
 }

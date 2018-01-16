@@ -16,6 +16,7 @@ service AppService {
 
 service ViewService {
     rpc RunApp (Link) returns (stream layout.Grid);
+    rpc Register (Message) returns (AppInfo);
 }
 
 

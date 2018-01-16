@@ -14,8 +14,10 @@ import (
 
 var registeredApps = map[string]*pb.AppInfo{}
 
+
 func RunGRPC(port string) {
 	lis, err := net.Listen("tcp", port)
+	log.Println("Running server at: ", lis.Addr())
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -47,4 +49,12 @@ type viewService struct{}
 
 func (service *viewService) RunApp(link *pb.Link, stream pb.ViewService_RunAppServer) error {
 	return nil
+}
+
+func (service *viewService) Register(ctx context.Context, in *pb.Message) (*pb.AppInfo, error) {
+	uuid := helpers.GenUUID4()
+	app := &pb.AppInfo{Id: uuid}
+	registeredApps[uuid] = app
+
+	return app, nil
 }
