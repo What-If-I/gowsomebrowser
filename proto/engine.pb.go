@@ -18,7 +18,7 @@ package browser
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import layout "layout"
+import layout "github.com/What-If-I/gowsomebrowser/proto/layout"
 
 import (
 	context "golang.org/x/net/context"

@@ -10,7 +10,10 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	testlayout "github.com/What-If-I/gowsomebrowser/testwebapp/layout"
 )
+
+var layoutStub = testlayout.GetTestLayout()
 
 var registeredApps = map[string]*pb.AppInfo{}
 
@@ -48,6 +51,7 @@ func (eng *appService) Register(ctx context.Context, in *pb.Message) (*pb.AppInf
 type viewService struct{}
 
 func (service *viewService) RunApp(link *pb.Link, stream pb.ViewService_RunAppServer) error {
+	stream.Send(&layoutStub)
 	return nil
 }
 

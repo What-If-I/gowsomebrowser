@@ -18,13 +18,13 @@ import (
 const defaultPort = ":50051"
 
 func main() {
-	appName := "main.go"
-	go engine.RunGRPC(defaultPort)
-	go runView()
+	//appName := "main.go"
+	engine.RunGRPC(defaultPort)
+	//go runView()
 
 	//url := "http://127.0.0.1:8000/" + appName
 	//downloadFromUrl(url)
-	runGoApp(appName)
+	//runGoApp(appName)
 }
 
 func downloadByUrl(url string) {
@@ -65,6 +65,5 @@ func runGoApp(path string) {
 	fmt.Printf(out.String())
 }
 
-func runView() {
-	runGoApp("testView.go")
-}
+// todo: that should run view app
+func runView() {}
